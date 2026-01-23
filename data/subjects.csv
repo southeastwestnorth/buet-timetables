@@ -1,0 +1,35 @@
+class_id,subject_id,name,duration,required_room_type,viable_rooms,is_optional
+11,CHEM109,Chemistry-I,1,,,0
+11,CHEM114,Chemistry-I Sessional,3,Lab,CHEM01,0
+11,EEE159,Electrical Technology,1,,,0
+11,EEE160,Electrical Technology Sessional,3,Lab,EEE01,0
+11,MATH161,Differential Calculus and Coordinate Geometry,1,,,0
+11,ME101,Introduction to Mechanical Engineering,1,,,0
+11,ME160,Mechanical Engineering Drawing-I,3,Lab,416,0
+11,PHY105,Physics-I,1,,,0
+11,SHOP160,Workshop Practice-I,3,Lab,SHOP01,0
+12,CHEM141,Chemistry-II,1,,,0
+12,HUM101,English-I,1,,,0
+12,HUM103,English-II,1,,,1
+12,MATH163,Integral Calculus and Differential Equations,1,,,0
+12,ME171,Computer Programming Language,1,,,0
+12,ME172,Computer Programming Language Sessional,3,Lab,ME01,0
+12,PHY102,Physics-II Sessional,3,Lab,PHY01,0
+12,PHY159,Physics-II,1,,,0
+12,SHOP170,Workshop Practice-II,3,Lab,SHOP02,0
+21,EEE259,Electrical Machines,1,,,0
+21,EEE260,Electrical Machines Sessional,3,Lab,EEE02,0
+21,HUM303,Bangladesh History and Culture,1,,,0
+21,MATH261,Vector Analysis and Complex Variables,1,,,0
+21,ME203,Engineering Thermodynamics,1,,,0
+21,ME204,Engineering Thermodynamics Sessional,3,Lab,ME02,0
+21,ME247,Engineering Mechanics-I,1,,,0
+31,IPE331,Work Study and Ergonomics,1,,,0
+31,IPE332,Work Study and Ergonomics Sessional,3,Lab,IPE01,0
+31,ME305,Heat Transfer,1,,,0
+31,ME306,Heat Transfer Sessional,3,Lab,ME04,0
+31,ME321,Fluid Mechanics-I,1,,,0
+31,ME349,Mechanics of Machinery,1,,,0
+31,ME350,Mechanics of Machinery Sessional,3,Lab,ME03,0
+31,ME361,Instrumentation and Measurement,1,,,0
+31,ME366,Electro-Mechanical System Design and Practice,3,Lab,ME05,0

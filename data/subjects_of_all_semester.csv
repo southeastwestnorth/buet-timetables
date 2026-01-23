@@ -1,0 +1,70 @@
+L-T,subject_id,name,duration,section count,required_room_type,credit,student,viable_rooms,is_optional
+1-1,ME101,Introduction to Mechanical Engineering,1,3,,3,60,,0
+1-1,EEE159,Electrical Technology,1,3,,3,60,,0
+1-1,MATH161,Differential Calculus and Coordinate Geometry,1,3,,4,60,,0
+1-1,PHY105,Physics-I,1,3,,3,60,,0
+1-1,CHEM109,Chemistry-I,1,3,,3,60,,0
+1-1,EEE160,Electrical Technology Sessional,3,3,Lab,0.75,60,EEE01,0
+1-1,ME160,Mechanical Engineering Drawing-I,3,3,Lab,1.5,60,416,0
+1-1,CHEM114,Chemistry-I Sessional,3,6,Lab,1.5,30,CHEM01,0
+1-1,SHOP160,Workshop Practice-I,3,6,Lab,1.5,30,SHOP01,0
+1-2,ME171,Computer Programming Language,1,3,,3,60,,0
+1-2,MATH163,Integral Calculus and Differential Equations,1,3,,4,60,,0
+1-2,PHY159,Physics-II,1,3,,3,60,,0
+1-2,CHEM141,Chemistry-II,1,3,,3,60,,0
+1-2,HUM101,English-I,1,2,,3,45,,0
+1-2,HUM103,English-II,1,2,,3,45,,1
+1-2,ME172,Computer Programming Language Sessional,3,6,Lab,1.5,30,ME01,0
+1-2,PHY102,Physics-II Sessional,3,3,Lab,1.5,60,PHY01,0
+1-2,SHOP170,Workshop Practice-II,3,3,Lab,0.75,60,SHOP02,0
+2-1,ME247,Engineering Mechanics-I,1,3,,3,60,,0
+2-1,ME203,Engineering Thermodynamics,1,3,,3,60,,0
+2-1,EEE259,Electrical Machines,1,3,,4,60,,0
+2-1,MATH261,Vector Analysis and Complex Variables,1,3,,4,60,,0
+2-1,HUM303,Bangladesh History and Culture,1,3,,3,60,,0
+2-1,EEE260,Electrical Machines Sessional,3,6,Lab,1.5,30,EEE02,0
+2-1,ME204,Engineering Thermodynamics Sessional,3,3,Lab,0.75,60,ME02,0
+2-2,ME261,Numerical Analysis,1,3,,3,60,,
+2-2,ME243,Mechanics of Solids,1,3,,3,60,,
+2-2,MME291,Engineering Materials,1,3,,3,60,,
+2-2,MATH263,Numerical Analysis and Fourier Series,1,3,,4,60,,
+2-2,ME249,Engineering Mechanics-II,1,3,,3,60,,
+2-2,MME292,Engineering Materials Sessional,3,6,Lab,1.5,30,,
+2-2,ME262,Numerical Analysis Sessional,3,3,Lab,0.75,60,,
+2-2,ME244,Mechanics of Solids Sessional,3,3,Lab,0.75,60,,
+2-2,ME260,Mechanical Engineering Drawing-II,3,6,Lab,1.5,30,ME01,
+3-1,IPE331,Work Study and Ergonomics,1,3,,4,60,,0
+3-1,ME321,Fluid Mechanics-I,1,3,,3,60,,0
+3-1,ME349,Mechanics of Machinery,1,3,,3,60,,0
+3-1,ME305,Heat Transfer,1,3,,3,60,,0
+3-1,ME361,Instrumentation and Measurement,1,3,,3,60,,0
+3-1,IPE332,Work Study and Ergonomics Sessional,3,3,Lab,0.75,60,IPE01,0
+3-1,ME350,Mechanics of Machinery Sessional,3,3,Lab,1.5,60,ME03,0
+3-1,ME306,Heat Transfer Sessional,3,3,Lab,0.75,60,ME04,0
+3-1,ME366,Electro-Mechanical System Design and Practice,3,3,Lab,1.5,60,ME05,0
+3-2,HUM201,Social Science-I,1,2,,3,45,,
+3-2,HUM203,Social Science-II,1,2,,3,45,,
+3-2,ME323,Fluid Mechanics-II,1,3,,3,60,,
+3-2,ME351,Machine Design,1,3,,4,60,,
+3-2,IPE381,Industrial Engineering and Management,1,3,,3,60,,
+3-2,ME307,Heat Transfer Equipment Design,3,3,Lab,3,60,,
+3-2,ME326,Fluid Mechanics Sessional,3,3,Lab,0.75,60,,
+3-2,ME352,Machine Design Sessional,3,6,Lab,1.5,30,,
+3-2,IPE382,Industrial Engineering and Management Sessional,3,3,Lab,0.75,60,,
+3-2,ME310,Thermo-Fluid System Design,3,6,Lab,1.5,30,,
+4-1,ME421,Fluid Machinery,1,3,,3,60,,
+4-1,IPE431,Operations Research,1,3,,3,60,,
+4-1,ME417,Internal Combustion Engines,1,3,,3,60,,
+4-1,Optional-I(3),Optional Course-I,1,3,,3,,,
+4-1,Optional-II(3),Optional Course-II,1,3,,3,,,
+4-1,ME422,Fluid Machinery Sessional,3,3,Lab,0.75,60,,
+4-1,IPE432,Operations Research Sessional,3,3,Lab,0.75,60,,
+4-1,ME418,Heat Engines Sessional,3,3,Lab,0.75,60,,
+4-1,ME400,Project and Thesis,6,6,Lab,3,,,
+4-2,ME419,Power Plant Engineering,1,3,,3,60,,
+4-2,Optional-III(3),Optional Course-III,1,3,,3,,,
+4-2,Optional-IV(3),Optional Course-IV,1,3,,3,,,
+4-2,Optional-V(3),Optional Course-V,1,3,,3,,,
+4-2,IPE481,Engineering Economy,1,4,,4,60,,
+4-2,ME420,Power Plant Engineering Sessional,3,3,Lab,0.75,60,,
+4-2,ME400,Project and Thesis,6,6,,3,,,
