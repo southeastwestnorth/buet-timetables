@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import os
+import re
 import csv
+from datetime import datetime
 from collections import defaultdict, namedtuple
 from dataclasses import dataclass
 from typing import List, Dict, Tuple, Optional
@@ -16,6 +18,34 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 OUT_DIR = os.path.join(BASE_DIR, 'output')
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(OUT_DIR, exist_ok=True)
+
+# ------------------------------
+# Constants
+# ------------------------------
+
+PERIOD_CONFIG = {
+    1: {"label": "1st", "time": "8:00 - 8:50"},
+    2: {"label": "2nd", "time": "9:00 - 9:50"},
+    3: {"label": "3rd", "time": "10:00 - 10:50"},
+    4: {"label": "4th", "time": "11:00 - 11:50"},
+    5: {"label": "5th", "time": "12:00 - 12:50"},
+    6: {"label": "6th", "time": "1:00 - 1:30"},
+    7: {"label": "7th", "time": "2:00 - 2:50"},
+    8: {"label": "8th", "time": "3:00 - 3:50"},
+    9: {"label": "9th", "time": "4:00 - 4:50"},
+}
+
+BREAK_TIME = "1:30 - 2:00"
+
+DAY_MAPPING = {
+    1: "Sa",
+    2: "Su",
+    3: "Mo",
+    4: "Tu",
+    5: "We",
+    6: "Th",
+    7: "Fr",
+}
 
 # ------------------------------
 # Data models
@@ -41,81 +71,32 @@ def write_csv(path: str, header: List[str], rows: List[List]):
         writer.writerows(rows)
 
 # ------------------------------
-# Sample data generation
-# ------------------------------
-
-def generate_sample_data():
-    """Create a small, solvable dataset to demonstrate the new data model."""
-    teachers_path = os.path.join(DATA_DIR, 'teachers.csv')
-    if not os.path.exists(teachers_path):
-        write_csv(teachers_path, ['teacher_id', 'name', 'seniority', 'max_load_day', 'max_load_week'], [
-            ['T1', 'Rahman', '1', '4', '15'],
-            ['T2', 'Akter', '2', '4', '15'],
-            ['T3', 'Saha', '1', '5', '18'],
-        ])
-
-    classes_path = os.path.join(DATA_DIR, 'classes.csv')
-    if not os.path.exists(classes_path):
-        write_csv(classes_path, ['class_id', 'name', 'size'], [
-            ['C7A', 'Class 7A', '28'],
-            ['C7B', 'Class 7B', '26'],
-        ])
-
-    rooms_path = os.path.join(DATA_DIR, 'rooms.csv')
-    if not os.path.exists(rooms_path):
-        write_csv(rooms_path, ['room_id', 'name', 'capacity', 'type'], [
-            ['R1', 'Room 1', '30', 'Theory'],
-            ['R2', 'Room 2', '30', 'Theory'],
-            ['Lab', 'Science Lab', '28', 'Lab'],
-        ])
-
-    subjects_path = os.path.join(DATA_DIR, 'subjects.csv')
-    if not os.path.exists(subjects_path):
-        write_csv(subjects_path, ['subject_id', 'name', 'duration', 'required_room_type'], [
-            ['Math', 'Mathematics', '1', ''],
-            ['Sci', 'Science', '2', 'Lab'],
-            ['Eng', 'English', '1', ''],
-        ])
-
-    curriculum_path = os.path.join(DATA_DIR, 'curriculum.csv')
-    if not os.path.exists(curriculum_path):
-        write_csv(curriculum_path, ['class_id', 'subject_id', 'teacher_id', 'periods_per_week', 'room_id'], [
-            ['C7A', 'Math', 'T1', '4', ''],
-            ['C7A', 'Sci', 'T2', '1', 'Lab'], # One 2-period session
-            ['C7A', 'Eng', 'T3', '3', ''],
-            ['C7B', 'Math', 'T1', '4', ''],
-            ['C7B', 'Sci', 'T2', '1', 'Lab'], # One 2-period session
-            ['C7B', 'Eng', 'T3', '3', ''],
-        ])
-
-    timeslots_path = os.path.join(DATA_DIR, 'timeslots.csv')
-    if not os.path.exists(timeslots_path):
-        rows = []
-        for d in range(1, 6):
-            for p in range(1, 7):
-                rows.append([str(d), str(p)])
-        write_csv(timeslots_path, ['day', 'period'], rows)
-
-    unavail_path = os.path.join(DATA_DIR, 'teacher_unavailability.csv')
-    if not os.path.exists(unavail_path):
-        write_csv(unavail_path, ['teacher_id', 'day', 'period'], [['T2', '5', '6']])
-
-    prefs_path = os.path.join(DATA_DIR, 'teacher_preferences.csv')
-    if not os.path.exists(prefs_path):
-        write_csv(prefs_path, ['teacher_id', 'day', 'period'], [['T1', '1', '1'], ['T2', '2', '3']])
-
-# ------------------------------
 # Data loading
 # ------------------------------
 
+def load_info_txt() -> Dict[str, str]:
+    info = {
+        'session_name': 'January 2025',
+        'footer_right_text': 'aSc Timetables'
+    }
+    path = os.path.join(BASE_DIR, 'info.txt')
+    if os.path.exists(path):
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f:
+                if '=' in line:
+                    key, val = line.split('=', 1)
+                    info[key.strip()] = val.strip()
+    return info
+
 def load_teachers() -> Dict[str, dict]:
     df = pd.read_csv(os.path.join(DATA_DIR, 'teachers.csv'))
+    # Be robust against extra columns by only using the ones we need.
     return {row['teacher_id']: {
         'name': row['name'],
         'seniority': int(row['seniority']),
         'max_load_day': int(row['max_load_day']),
         'max_load_week': int(row['max_load_week']),
-    } for _, row in df.iterrows()}
+    } for _, row in df[['teacher_id', 'name', 'seniority', 'max_load_day', 'max_load_week']].iterrows()}
 
 def load_classes() -> Dict[str, dict]:
     df = pd.read_csv(os.path.join(DATA_DIR, 'classes.csv'))
@@ -181,26 +162,104 @@ def load_teacher_preferences() -> Dict[str, set]:
     return prefs
 
 def load_curriculum() -> List[Session]:
-    df = pd.read_csv(os.path.join(DATA_DIR, 'curriculum.csv'))
+    # Defines the columns that are essential for scheduling. This makes the loader
+    # robust against extra columns (like 'dept') being added to the CSV.
+    required_cols = ['class_id', 'subject_id', 'teacher_id', 'periods_per_week']
+
+    # 'room_id' is optional; we check for its existence later.
+    all_possible_cols = required_cols + ['room_id']
+
+    try:
+        df_full = pd.read_csv(os.path.join(DATA_DIR, 'curriculum.csv'))
+    except FileNotFoundError:
+        return [] # Or handle with a log/error message
+
+    # Filter the DataFrame to only include columns we care about, if they exist.
+    existing_cols = [col for col in all_possible_cols if col in df_full.columns]
+    df = df_full[existing_cols].copy()
+
+    # Drop rows where essential data is missing to prevent crashes.
+    df.dropna(subset=required_cols, inplace=True)
+
+    # Ensure 'periods_per_week' is of integer type before use.
+    df['periods_per_week'] = df['periods_per_week'].astype(int)
+
     sessions: List[Session] = []
     idx = 0
     for _, row in df.iterrows():
-        num_sessions = int(row['periods_per_week'])
-        fixed_room = row['room_id'] if pd.notna(row['room_id']) and str(row['room_id']).strip() else None
+        num_sessions = row['periods_per_week']
+
+        # Handle the optional 'room_id' column gracefully.
+        fixed_room = None
+        if 'room_id' in df.columns and pd.notna(row['room_id']) and str(row['room_id']).strip():
+            fixed_room = str(row['room_id']).strip()
+
         for k in range(num_sessions):
             idx += 1
             sessions.append(Session(
-                session_id=f'S{idx}', class_id=row['class_id'], subject_id=row['subject_id'],
-                teacher_id=row['teacher_id'], room_id=fixed_room
+                session_id=f'S{idx}',
+                class_id=row['class_id'],
+                subject_id=row['subject_id'],
+                teacher_id=row['teacher_id'],
+                room_id=fixed_room
             ))
     return sessions
+
+# ------------------------------
+# Home Room Assignment
+# ------------------------------
+
+def assign_home_rooms(classes: Dict[str, dict], rooms: Dict[str, dict]) -> Dict[str, str]:
+    """Assigns a home room to each class section."""
+    # Group rooms by name (e.g., 'r1', 'r2')
+    rooms_by_name = defaultdict(list)
+    for room_id, room_info in rooms.items():
+        if room_info['type'] == 'Theory': # Only consider theory rooms as home rooms
+            rooms_by_name[room_info['name']].append(room_id)
+
+    # Sort room groups by name
+    sorted_room_groups = [rooms_by_name[name] for name in sorted(rooms_by_name.keys())]
+    for group in sorted_room_groups:
+        group.sort()
+
+    # Group classes by base name (e.g., '11A' -> '11', '1-1-A' -> '1-1')
+    classes_by_base = defaultdict(list)
+    for class_id in classes:
+        # Find the last non-alphanumeric character to split the section from the base name
+        parts = re.split(r'([^a-zA-Z0-9])', class_id)
+        if len(parts) > 2:
+            base_name = "".join(parts[:-2])
+        else:
+            # Handle cases like '11A' by removing the last character
+            base_name = class_id[:-1]
+        classes_by_base[base_name].append(class_id)
+
+    # Sort class groups by name
+    sorted_class_groups = [classes_by_base[name] for name in sorted(classes_by_base.keys())]
+    for group in sorted_class_groups:
+        group.sort()
+
+    # Check for mismatches
+    if len(sorted_class_groups) > len(sorted_room_groups):
+        raise ValueError("Not enough room groups to assign to all class groups.")
+
+    home_room_map = {}
+    for i, class_group in enumerate(sorted_class_groups):
+        room_group = sorted_room_groups[i]
+        if len(class_group) != len(room_group):
+            raise ValueError(f"Mismatch in size for class group {class_group[0][:-1]} ({len(class_group)} sections) and room group '{rooms[room_group[0]]['name']}' ({len(room_group)} rooms).")
+
+        for class_id, room_id in zip(class_group, room_group):
+            home_room_map[class_id] = room_id
+
+    return home_room_map
 
 # ------------------------------
 # Timetable solver (OR-Tools)
 # ------------------------------
 
 class ORTimetableSolver:
-    def __init__(self, sessions, timeslots, rooms, classes, teachers, subjects, unavailability, teacher_preferences, time_limit_sec=30):
+    def __init__(self, sessions, timeslots, rooms, classes, teachers, subjects, unavailability, teacher_preferences, home_room_map, time_limit_sec=30):
         self.sessions = sessions
         self.timeslots = timeslots
         self.rooms = rooms
@@ -209,11 +268,10 @@ class ORTimetableSolver:
         self.subjects = subjects
         self.unavailability = unavailability
         self.teacher_preferences = teacher_preferences
+        self.home_room_map = home_room_map
         self.time_limit_sec = time_limit_sec
         self.model = cp_model.CpModel()
 
-        # Helper constant for non-lab sessions that don't need a specific room
-        self.NO_ROOM_ASSIGNED = "HOME_ROOM"
         # Helper structure to hold all possible (session, timeslot, room) assignments for a session
         self.possible_assignments_for_session = defaultdict(list)
 
@@ -255,8 +313,11 @@ class ORTimetableSolver:
                     if r_id in self.rooms and self.classes[s.class_id]['size'] <= self.rooms[r_id]['capacity']:
                         possible_rooms.append(r_id)
             else:
-                # Non-lab sessions are assigned to their conceptual "home room"
-                possible_rooms.append(self.NO_ROOM_ASSIGNED)
+                # Theory sessions are assigned to their designated home room
+                home_room = self.home_room_map.get(s.class_id)
+                if home_room:
+                    possible_rooms.append(home_room)
+                # If a class has no home room, it cannot be scheduled.
 
             # Create variables for each valid combination of (session, timeslot, room)
             for t in self.timeslots:
@@ -526,47 +587,202 @@ class ORTimetableSolver:
 # Output generation
 # ------------------------------
 
-def create_output_tables(assignment: Dict[str, Tuple[Timeslot, str]], sessions: List[Session], teachers: Dict[str, dict], classes: Dict[str, dict], rooms: Dict[str, dict], subjects: Dict[str, dict], timeslots: List[Timeslot]):
+def format_class_name(class_id: str) -> str:
+    # Pattern 11A -> ME L-1/T-1 (Sec A)
+    if len(class_id) >= 3 and class_id[0].isdigit() and class_id[1].isdigit():
+        level = class_id[0]
+        term = class_id[1]
+        sec = class_id[2:]
+        return f"ME L-{level}/T-{term} (Sec {sec})"
+    return f"ME {class_id}"
+
+def format_room_id(room_id: str, rooms: Dict[str, dict]) -> str:
+    room_info = rooms.get(room_id, {})
+    if room_info.get('type') == 'Theory':
+        return f"ME {room_id}"
+    return room_id
+
+def write_home_rooms_csv(home_room_map: Dict[str, str], rooms: Dict[str, dict]):
+    """Writes the home room assignments to a CSV file."""
+    header = ['class_id', 'home_room']
+    rows = []
+    for class_id, room_id in sorted(home_room_map.items()):
+        rows.append([class_id, room_id])
+    path = os.path.join(OUT_DIR, 'homerooms.csv')
+    write_csv(path, header, rows)
+
+def create_output_tables(assignment: Dict[str, Tuple[Timeslot, str]], sessions: List[Session], teachers: Dict[str, dict], classes: Dict[str, dict], rooms: Dict[str, dict], subjects: Dict[str, dict], timeslots: List[Timeslot], home_room_map: Dict[str, str], info: Dict[str, str]):
     sessions_by_id = {s.session_id: s for s in sessions}
     days = sorted(list(set(t.day for t in timeslots)))
     periods = sorted(list(set(t.period for t in timeslots)))
 
-    # A non-lab session assigned to "HOME_ROOM" will display an empty room string
-    get_room_display = lambda r: '' if r == "HOME_ROOM" else r
+    css = """
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .timetable { border-collapse: collapse; width: 100%; table-layout: fixed; }
+        .timetable th, .timetable td { border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle; height: 80px; position: relative; }
+        .period-header { font-size: 14px; font-weight: bold; }
+        .time-header { font-size: 10px; font-weight: normal; }
+        .day-label { font-size: 40px; font-weight: normal; width: 80px; }
+        .subject-id { font-size: 18px; font-weight: normal; display: block; margin-bottom: 5px; }
+        .teacher-id { font-size: 10px; position: absolute; bottom: 5px; right: 5px; }
+        .room-info { font-size: 10px; position: absolute; bottom: 5px; left: 5px; }
+        .break-cell { width: 40px; }
+        .home-room { text-align: right; font-size: 14px; margin-bottom: 5px; }
+        .header-title { text-align: center; margin-bottom: 0; }
+        .class-title { text-align: center; font-size: 48px; margin-top: 0; margin-bottom: 10px; }
+        .footer { width: 100%; margin-top: 20px; font-size: 12px; }
+        .footer-left { float: left; }
+        .footer-right { float: right; }
+        .clearfix::after { content: ""; clear: both; display: table; }
+    </style>
+    """
+
+    generated_time = datetime.now().strftime("%d/%m/%Y")
 
     for class_id, cinfo in classes.items():
-        grid = [["" for _ in periods] for _ in days]
+        # grid[day_idx][period_idx] = session_id or None
+        grid = [[None for _ in periods] for _ in days]
+        # To handle multi-period (colspan)
+        covered = [[False for _ in periods] for _ in days]
+
         for sid, (t, r) in assignment.items():
             s = sessions_by_id.get(sid)
             if s and s.class_id == class_id:
-                subj_name = subjects.get(s.subject_id, {}).get('name', 'N/A')
-                teacher_name = teachers.get(s.teacher_id, {}).get('name', 'N/A')
-                room_display = get_room_display(r)
-                cell = f"{subj_name}\n({teacher_name})"
-                if room_display:
-                    cell += f" @ {room_display}"
                 di, pi = days.index(t.day), periods.index(t.period)
-                grid[di][pi] = cell
-        df = pd.DataFrame(grid, index=days, columns=periods)
-        df.to_csv(os.path.join(OUT_DIR, f'class_{class_id}_timetable.csv'))
-        df.to_html(os.path.join(OUT_DIR, f'class_{class_id}_timetable.html'), border=1, classes='table table-striped')
+                grid[di][pi] = sid
+
+        html = f"<html><head>{css}</head><body>"
+        html += f"<div class='header-title'>Final Term Routine (Term: {info.get('session_name', 'N/A')})</div>"
+        html += f"<div class='class-title'>{format_class_name(class_id)}</div>"
+
+        hr_id = home_room_map.get(class_id)
+        if hr_id:
+            formatted_hr = format_room_id(hr_id, rooms)
+            html += f"<div class='home-room'>R#{formatted_hr}</div>"
+
+        html += "<table class='timetable'>"
+
+        # Header Row
+        html += "<tr><th></th>"
+        for p in periods:
+            p_label = PERIOD_CONFIG.get(p, {}).get('label', f"{p}th")
+            p_time = PERIOD_CONFIG.get(p, {}).get('time', '')
+            html += f"<th><div class='period-header'>{p_label}</div><div class='time-header'>{p_time}</div></th>"
+            if p == 6:
+                html += f"<th rowspan='{len(days) + 1}' class='break-cell'>Break<br><br><div class='time-header'>{BREAK_TIME}</div></th>"
+        html += "</tr>"
+
+        # Data Rows
+        for d_idx, d in enumerate(days):
+            html += "<tr>"
+            html += f"<td class='day-label'>{DAY_MAPPING.get(d, str(d))}</td>"
+            for p_idx, p in enumerate(periods):
+                if covered[d_idx][p_idx]:
+                    continue
+
+                sid = grid[d_idx][p_idx]
+                if sid:
+                    s = sessions_by_id[sid]
+                    duration = subjects[s.subject_id]['duration']
+                    colspan = duration
+
+                    # Ensure colspan doesn't exceed periods or cross period 6/7 boundary if that's a thing
+                    # But usually labs are either 1-3, 4-6, or 7-9, so they don't cross period 6/7 boundary.
+
+                    for i in range(colspan):
+                        if p_idx + i < len(periods):
+                            covered[d_idx][p_idx + i] = True
+
+                    t_val, cell_r_id = assignment[sid]
+
+                    room_info_display = ""
+                    subject = subjects[s.subject_id]
+                    if subject.get('required_room_type') == 'Lab':
+                        room_name = rooms.get(cell_r_id, {}).get('name', cell_r_id)
+                        room_info_display = f"<div class='room-info'>{room_name} #{cell_r_id}</div>"
+
+                    html += f"<td colspan='{colspan}'>"
+                    html += f"<span class='subject-id'>{s.subject_id}</span>"
+                    html += f"<div class='teacher-id'>{s.teacher_id}</div>"
+                    html += room_info_display
+                    html += "</td>"
+                else:
+                    html += "<td></td>"
+            html += "</tr>"
+
+        html += "</table>"
+
+        # Footer
+        html += f"<div class='footer clearfix'>"
+        html += f"<div class='footer-left'>Timetable generated:{generated_time}</div>"
+        html += f"<div class='footer-right'>{info.get('footer_right_text', '') or 'aSc Timetables'}</div>"
+        html += "</div>"
+
+        html += "</body></html>"
+
+        with open(os.path.join(OUT_DIR, f'class_{class_id}_timetable.html'), 'w', encoding='utf-8') as f:
+            f.write(html)
 
     for teacher_id, tinfo in teachers.items():
-        grid = [["" for _ in periods] for _ in days]
+        grid = [[None for _ in periods] for _ in days]
+        covered = [[False for _ in periods] for _ in days]
+
         for sid, (t, r) in assignment.items():
             s = sessions_by_id.get(sid)
             if s and s.teacher_id == teacher_id:
-                subj_name = subjects.get(s.subject_id, {}).get('name', 'N/A')
-                class_name = classes.get(s.class_id, {}).get('name', 'N/A')
-                room_display = get_room_display(r)
-                cell = f"{subj_name}\n({class_name})"
-                if room_display:
-                    cell += f" @ {room_display}"
                 di, pi = days.index(t.day), periods.index(t.period)
-                grid[di][pi] += cell
-        df = pd.DataFrame(grid, index=days, columns=periods)
-        df.to_csv(os.path.join(OUT_DIR, f'teacher_{teacher_id}_timetable.csv'))
-        df.to_html(os.path.join(OUT_DIR, f'teacher_{teacher_id}_timetable.html'), border=1, classes='table table-striped')
+                grid[di][pi] = sid
+
+        html = f"<html><head>{css}</head><body>"
+        html += f"<div class='header-title'>Teacher Routine (Term: {info.get('session_name', 'N/A')})</div>"
+        html += f"<div class='class-title'>{teachers.get(teacher_id, {}).get('name', teacher_id)} ({teacher_id})</div>"
+        html += "<table class='timetable'>"
+
+        # Header Row
+        html += "<tr><th></th>"
+        for p in periods:
+            p_label = PERIOD_CONFIG.get(p, {}).get('label', f"{p}th")
+            p_time = PERIOD_CONFIG.get(p, {}).get('time', '')
+            html += f"<th><div class='period-header'>{p_label}</div><div class='time-header'>{p_time}</div></th>"
+            if p == 6:
+                html += f"<th rowspan='{len(days) + 1}' class='break-cell'>Break<br><br><div class='time-header'>{BREAK_TIME}</div></th>"
+        html += "</tr>"
+
+        # Data Rows
+        for d_idx, d in enumerate(days):
+            html += "<tr>"
+            html += f"<td class='day-label'>{DAY_MAPPING.get(d, str(d))}</td>"
+            for p_idx, p in enumerate(periods):
+                if covered[d_idx][p_idx]:
+                    continue
+
+                sid = grid[d_idx][p_idx]
+                if sid:
+                    s = sessions_by_id[sid]
+                    duration = subjects[s.subject_id]['duration']
+                    colspan = duration
+                    for i in range(colspan):
+                        if p_idx + i < len(periods):
+                            covered[d_idx][p_idx + i] = True
+
+                    t_val, cell_r_id = assignment[sid]
+                    formatted_room = format_room_id(cell_r_id, rooms)
+
+                    html += f"<td colspan='{colspan}'>"
+                    html += f"<span class='subject-id'>{s.subject_id}</span>"
+                    html += f"<div class='teacher-id'>{s.class_id}</div>"
+                    html += f"<div class='room-info'>{formatted_room}</div>"
+                    html += "</td>"
+                else:
+                    html += "<td></td>"
+            html += "</tr>"
+        html += "</table>"
+        html += f"<div class='footer clearfix'><div class='footer-left'>Timetable generated:{generated_time}</div><div class='footer-right'>{info.get('footer_right_text', '') or 'aSc Timetables'}</div></div>"
+        html += "</body></html>"
+
+        with open(os.path.join(OUT_DIR, f'teacher_{teacher_id}_timetable.html'), 'w', encoding='utf-8') as f:
+            f.write(html)
 
     combined_rows = [['session_id', 'class', 'subject', 'teacher', 'day', 'period', 'room']]
     for sid, (t, r) in sorted(assignment.items(), key=lambda x: (x[1][0].day, x[1][0].period)):
@@ -574,7 +790,7 @@ def create_output_tables(assignment: Dict[str, Tuple[Timeslot, str]], sessions: 
         if s:
             combined_rows.append([
                 sid, s.class_id, subjects.get(s.subject_id, {}).get('name', 'N/A'),
-                teachers.get(s.teacher_id, {}).get('name', 'N/A'), t.day, t.period, get_room_display(r)
+                teachers.get(s.teacher_id, {}).get('name', 'N/A'), t.day, t.period, r
             ])
     write_csv(os.path.join(OUT_DIR, 'all_assignments.csv'), combined_rows[0], combined_rows[1:])
 
@@ -584,6 +800,7 @@ def create_output_tables(assignment: Dict[str, Tuple[Timeslot, str]], sessions: 
 
 def run():
     # generate_sample_data() # Use existing data
+    info = load_info_txt()
     optional_included = False
     teachers = load_teachers()
     classes = load_classes()
@@ -594,6 +811,15 @@ def run():
     teacher_preferences = load_teacher_preferences()
     sessions = load_curriculum()
     
+    # Filter classes to only those present in the curriculum
+    active_class_ids = {s.class_id for s in sessions}
+    active_classes = {cid: cinfo for cid, cinfo in classes.items() if cid in active_class_ids}
+
+    try:
+        home_room_map = assign_home_rooms(active_classes, rooms)
+    except ValueError as e:
+        return {'status': f"ERROR: {e}", 'sessions_total': 0, 'sessions_scheduled': 0, 'output_dir': OUT_DIR, 'data_dir': DATA_DIR}
+
     if not optional_included:
         optional_subject_ids = {
             subject_id for subject_id, subject_data in subjects.items()
@@ -603,15 +829,26 @@ def run():
             s for s in sessions if s.subject_id not in optional_subject_ids
         ]
 
+    # After loading and filtering, if there are no sessions, it's impossible to
+    # generate a timetable. This can happen if curriculum.csv is empty or malformed.
+    if not sessions:
+        status = "WARNING: No valid session data found. Cannot generate a timetable."
+        return {
+            'status': status, 'sessions_total': 0,
+            'sessions_scheduled': 0, 'output_dir': OUT_DIR,
+            'data_dir': DATA_DIR,
+        }
+
     solver = ORTimetableSolver(
         sessions, timeslots, rooms, classes, teachers, subjects, 
-        unavailability, teacher_preferences
+        unavailability, teacher_preferences, home_room_map
     )
     success, assignment = solver.solve()
     
     status = "SUCCESS: Timetable generated." if success else "WARNING: No solution found."
     if success:
-        create_output_tables(assignment, sessions, teachers, classes, rooms, subjects, timeslots)
+        create_output_tables(assignment, sessions, teachers, classes, rooms, subjects, timeslots, home_room_map, info)
+        write_home_rooms_csv(home_room_map, rooms)
 
     return {
         'status': status, 'sessions_total': len(sessions),
