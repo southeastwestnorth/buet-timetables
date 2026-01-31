@@ -1,0 +1,70 @@
+L-T,subject_id,dept,name,duration,section count,required_room_type,credit,student,viable_rooms,is_optional
+1-1,ME101,ME,Introduction to Mechanical Engineering,1,3,,3.0,60.0,,0.0
+1-1,EEE159,EEE,Electrical Technology,1,3,,3.0,60.0,,0.0
+1-1,MATH161,MATH,Differential Calculus and Coordinate Geometry,1,3,,4.0,60.0,,0.0
+1-1,PHY105,PHY,Physics-I,1,3,,3.0,60.0,,0.0
+1-1,CHEM109,CHEM,Chemistry-I,1,3,,3.0,60.0,,0.0
+1-1,EEE160,EEE,Electrical Technology Sessional,3,3,Lab,0.75,60.0,EEE01,0.0
+1-1,ME160,ME,Mechanical Engineering Drawing-I,3,3,Lab,1.5,60.0,416,0.0
+1-1,CHEM114,CHEM,Chemistry-I Sessional,3,6,Lab,1.5,30.0,CHEM01,0.0
+1-1,SHOP160,SHOP,Workshop Practice-I,3,6,Lab,1.5,30.0,SHOP01,0.0
+1-2,ME171,ME,Computer Programming Language,1,3,,3.0,60.0,,0.0
+1-2,MATH163,MATH,Integral Calculus and Differential Equations,1,3,,4.0,60.0,,0.0
+1-2,PHY159,PHY,Physics-II,1,3,,3.0,60.0,,0.0
+1-2,CHEM141,CHEM,Chemistry-II,1,3,,3.0,60.0,,0.0
+1-2,HUM101,HUM,English-I,1,2,,3.0,45.0,,0.0
+1-2,HUM103,HUM,English-II,1,2,,3.0,45.0,,1.0
+1-2,ME172,ME,Computer Programming Language Sessional,3,6,Lab,1.5,30.0,ME01,0.0
+1-2,PHY102,PHY,Physics-II Sessional,3,3,Lab,1.5,60.0,PHY01,0.0
+1-2,SHOP170,SHOP,Workshop Practice-II,3,3,Lab,0.75,60.0,SHOP02,0.0
+2-1,ME247,ME,Engineering Mechanics-I,1,3,,3.0,60.0,,0.0
+2-1,ME203,ME,Engineering Thermodynamics,1,3,,3.0,60.0,,0.0
+2-1,EEE259,EEE,Electrical Machines,1,3,,4.0,60.0,,0.0
+2-1,MATH261,MATH,Vector Analysis and Complex Variables,1,3,,4.0,60.0,,0.0
+2-1,HUM303,HUM,Bangladesh History and Culture,1,3,,3.0,60.0,,0.0
+2-1,EEE260,EEE,Electrical Machines Sessional,3,6,Lab,1.5,30.0,EEE02,0.0
+2-1,ME204,ME,Engineering Thermodynamics Sessional,3,3,Lab,0.75,60.0,ME02,0.0
+2-2,ME261,ME,Numerical Analysis,1,3,,3.0,60.0,,
+2-2,ME243,ME,Mechanics of Solids,1,3,,3.0,60.0,,
+2-2,MME291,MME,Engineering Materials,1,3,,3.0,60.0,,
+2-2,MATH263,MATH,Numerical Analysis and Fourier Series,1,3,,4.0,60.0,,
+2-2,ME249,ME,Engineering Mechanics-II,1,3,,3.0,60.0,,
+2-2,MME292,MME,Engineering Materials Sessional,3,6,Lab,1.5,30.0,,
+2-2,ME262,ME,Numerical Analysis Sessional,3,3,Lab,0.75,60.0,,
+2-2,ME244,ME,Mechanics of Solids Sessional,3,3,Lab,0.75,60.0,,
+2-2,ME260,ME,Mechanical Engineering Drawing-II,3,6,Lab,1.5,30.0,ME01,
+3-1,IPE331,IPE,Work Study and Ergonomics,1,3,,4.0,60.0,,0.0
+3-1,ME321,ME,Fluid Mechanics-I,1,3,,3.0,60.0,,0.0
+3-1,ME349,ME,Mechanics of Machinery,1,3,,3.0,60.0,,0.0
+3-1,ME305,ME,Heat Transfer,1,3,,3.0,60.0,,0.0
+3-1,ME361,ME,Instrumentation and Measurement,1,3,,3.0,60.0,,0.0
+3-1,IPE332,IPE,Work Study and Ergonomics Sessional,3,3,Lab,0.75,60.0,IPE01,0.0
+3-1,ME350,ME,Mechanics of Machinery Sessional,3,3,Lab,1.5,60.0,ME03,0.0
+3-1,ME306,ME,Heat Transfer Sessional,3,3,Lab,0.75,60.0,ME04,0.0
+3-1,ME366,ME,Electro-Mechanical System Design and Practice,3,3,Lab,1.5,60.0,ME05,0.0
+3-2,HUM201,HUM,Social Science-I,1,2,,3.0,45.0,,
+3-2,HUM203,HUM,Social Science-II,1,2,,3.0,45.0,,
+3-2,ME323,ME,Fluid Mechanics-II,1,3,,3.0,60.0,,
+3-2,ME351,ME,Machine Design,1,3,,4.0,60.0,,
+3-2,IPE381,IPE,Industrial Engineering and Management,1,3,,3.0,60.0,,
+3-2,ME307,ME,Heat Transfer Equipment Design,3,3,Lab,3.0,60.0,,
+3-2,ME326,ME,Fluid Mechanics Sessional,3,3,Lab,0.75,60.0,,
+3-2,ME352,ME,Machine Design Sessional,3,6,Lab,1.5,30.0,,
+3-2,IPE382,IPE,Industrial Engineering and Management Sessional,3,3,Lab,0.75,60.0,,
+3-2,ME310,ME,Thermo-Fluid System Design,3,6,Lab,1.5,30.0,,
+4-1,ME421,ME,Fluid Machinery,1,3,,3.0,60.0,,
+4-1,IPE431,IPE,Operations Research,1,3,,3.0,60.0,,
+4-1,ME417,ME,Internal Combustion Engines,1,3,,3.0,60.0,,
+4-1,Optional-I(3),Optional-I(),Optional Course-I,1,3,,3.0,,,
+4-1,Optional-II(3),Optional-II(),Optional Course-II,1,3,,3.0,,,
+4-1,ME422,ME,Fluid Machinery Sessional,3,3,Lab,0.75,60.0,,
+4-1,IPE432,IPE,Operations Research Sessional,3,3,Lab,0.75,60.0,,
+4-1,ME418,ME,Heat Engines Sessional,3,3,Lab,0.75,60.0,,
+4-1,ME400,ME,Project and Thesis,6,6,Lab,3.0,,,
+4-2,ME419,ME,Power Plant Engineering,1,3,,3.0,60.0,,
+4-2,Optional-III(3),Optional-III(),Optional Course-III,1,3,,3.0,,,
+4-2,Optional-IV(3),Optional-IV(),Optional Course-IV,1,3,,3.0,,,
+4-2,Optional-V(3),Optional-V(),Optional Course-V,1,3,,3.0,,,
+4-2,IPE481,IPE,Engineering Economy,1,4,,4.0,60.0,,
+4-2,ME420,ME,Power Plant Engineering Sessional,3,3,Lab,0.75,60.0,,
+4-2,ME400,ME,Project and Thesis,6,6,,3.0,,,

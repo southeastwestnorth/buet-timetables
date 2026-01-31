@@ -1,0 +1,59 @@
+﻿teacher_id,name,seniority,max_load_day,max_load_week,dept
+MAR2,Ashiq,1,4,15,ME
+AKM,Alok,1,4,15,ME
+NH,Naseem,1,4,15,ME
+SSA,Ahbab,1,4,15,EEE
+DOH,Zawad,1,4,15,EEE
+rana,shohel,1,4,15,MATH
+alim,alim,1,4,15,MATH
+israt,israt,1,4,15,MATH
+nasreen,nasreen,1,4,15,PHY
+ratan,ratan,1,4,15,PHY
+jellur,jellur,1,4,15,PHY
+rashed,Rashed,1,4,15,CHEM
+nobi,nobi,1,4,15,CHEM
+miran,miran,1,4,15,CHEM
+rajib,rajib,1,4,15,SHOP
+ehsan,(eee160 course teacher),1,4,15,EEE
+shakila,(chem114 course teacher,1,4,15,CHEM
+SMS,shavik,1,4,15,ME
+MM,mamun,1,4,15,ME
+azizar,azizar,1,4,15,PHY
+mostak,mostak,1,4,15,PHY
+basith,basith,1,4,15,PHY
+kaium,kaium,1,4,15,CHEM
+chanchal,chanchal,1,4,15,CHEM
+halim,halim,1,4,15,MATH
+mashud,mashud,1,4,15,MATH
+rauf,rauf,1,4,15,HUM
+mahfuzur,mahfuzur,1,4,15,HUM
+rahul,Rahul,1,4,15,HUM
+rakinul,rakinul,1,4,15,HUM
+motaleb,motaleb,1,4,15,HUM
+MA,Abdullah,1,6,25,ME
+tony,me170 course teacher,1,4,15,ME
+SC,eee259 course teacher,1,4,20,EEE
+MAM,motalab,1,4,15,ME
+MZH,me203 course teacher,1,4,15,ME
+MAA,afsar,1,4,15,ME
+AS,me203 course teacher,1,4,15,ME
+ARJ,eee260 course teacher,1,4,15,EEE
+me204,me204 course teacher,1,4,15,ME
+MMR,a,1,4,15,ME
+TH,a,1,4,15,ME
+NRD,a,1,4,15,IPE
+ABMM,a,1,4,15,IPE
+KAR,a,1,4,15,ME
+SS,a,1,4,15,ME
+NAS,a,1,4,15,IPE
+MASA,a,1,4,15,ME
+me350,me350 course teacher,1,4,15,ME
+ipe332,a,1,4,15,IPE
+shopper,shopper,1,4,15,SHOP
+rahim,eee170,1,4,15,EEE
+h1,a,1,4,15,HUM
+h2,a,1,4,15,HUM
+h3,a,1,4,15,HUM
+me366,a,1,4,15,ME
+KI,a,1,4,15,EEE
+MAR,a,1,4,15,ME

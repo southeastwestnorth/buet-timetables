@@ -1,0 +1,35 @@
+class_id,subject_id,dept,name,duration,required_room_type,viable_rooms,is_optional
+11,CHEM109,CHEM,Chemistry-I,1,,,0
+11,CHEM114,CHEM,Chemistry-I Sessional,3,Lab,CHEM01,0
+11,EEE159,EEE,Electrical Technology,1,,,0
+11,EEE160,EEE,Electrical Technology Sessional,3,Lab,EEE01,0
+11,MATH161,MATH,Differential Calculus and Coordinate Geometry,1,,,0
+11,ME101,ME,Introduction to Mechanical Engineering,1,,,0
+11,ME160,ME,Mechanical Engineering Drawing-I,3,Lab,416,0
+11,PHY105,PHY,Physics-I,1,,,0
+11,SHOP160,SHOP,Workshop Practice-I,3,Lab,SHOP01,0
+12,CHEM141,CHEM,Chemistry-II,1,,,0
+12,HUM101,HUM,English-I,1,,,0
+12,HUM103,HUM,English-II,1,,,1
+12,MATH163,MATH,Integral Calculus and Differential Equations,1,,,0
+12,ME171,ME,Computer Programming Language,1,,,0
+12,ME172,ME,Computer Programming Language Sessional,3,Lab,ME01,0
+12,PHY102,PHY,Physics-II Sessional,3,Lab,PHY01,0
+12,PHY159,PHY,Physics-II,1,,,0
+12,SHOP170,SHOP,Workshop Practice-II,3,Lab,SHOP02,0
+21,EEE259,EEE,Electrical Machines,1,,,0
+21,EEE260,EEE,Electrical Machines Sessional,3,Lab,EEE02,0
+21,HUM303,HUM,Bangladesh History and Culture,1,,,0
+21,MATH261,MATH,Vector Analysis and Complex Variables,1,,,0
+21,ME203,ME,Engineering Thermodynamics,1,,,0
+21,ME204,ME,Engineering Thermodynamics Sessional,3,Lab,ME02,0
+21,ME247,ME,Engineering Mechanics-I,1,,,0
+31,IPE331,IPE,Work Study and Ergonomics,1,,,0
+31,IPE332,IPE,Work Study and Ergonomics Sessional,3,Lab,IPE01,0
+31,ME305,ME,Heat Transfer,1,,,0
+31,ME306,ME,Heat Transfer Sessional,3,Lab,ME04,0
+31,ME321,ME,Fluid Mechanics-I,1,,,0
+31,ME349,ME,Mechanics of Machinery,1,,,0
+31,ME350,ME,Mechanics of Machinery Sessional,3,Lab,ME03,0
+31,ME361,ME,Instrumentation and Measurement,1,,,0
+31,ME366,ME,Electro-Mechanical System Design and Practice,3,Lab,ME05,0
