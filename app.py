@@ -5,7 +5,9 @@ import hashlib
 import streamlit.components.v1 as components
 from bs4 import BeautifulSoup
 import plotly.express as px
+import base64
 
+# --- BACKEND CHECK ---
 try:
     import main as solver_engine 
     import data_validator 
@@ -13,6 +15,7 @@ try:
 except ImportError:
     BACKEND_AVAILABLE = False
 
+# --- CONFIG ---
 st.set_page_config(
     page_title="Cadence", 
     page_icon="assets/logo.png",
@@ -24,33 +27,61 @@ DIRS = ["data", "output", "assets"]
 for d in DIRS:
     os.makedirs(d, exist_ok=True)
 
+# --- CSS: FORCE LIGHT THEME & STYLING ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-    
-    .main-header { 
-        font-size: 2.2rem; font-weight: 800; 
-        margin-bottom: 5px; 
+    /* FORCE LIGHT MODE BACKGROUNDS */
+    [data-testid="stAppViewContainer"] {
+        background-color: #F8FAFC !important;
+        color: #0F172A !important;
     }
-    .sub-header { font-size: 1rem; opacity: 0.7; margin-bottom: 25px; }
-
+    [data-testid="stSidebar"] {
+        background-color: #FFFFFF !important;
+        border-right: 1px solid #E2E8F0;
+    }
+    [data-testid="stHeader"] {
+        background-color: rgba(255,255,255,0.9) !important;
+    }
+    
+    /* Text Overrides */
+    h1, h2, h3, h4, h5, h6, p, li, span, div, label {
+        color: #0F172A !important;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Metric Cards */
     .metric-container {
+        background-color: #FFFFFF !important;
         padding: 20px; border-radius: 12px;
-        border: 1px solid rgba(128, 128, 128, 0.2);
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
-    .m-label { opacity: 0.6; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
-    .m-value { font-size: 1.8rem; font-weight: 800; margin-top: 5px; }
-    
+    .m-label { color: #64748B !important; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
+    .m-value { font-size: 1.8rem; font-weight: 800; color: #0F172A !important; margin-top: 5px; }
+
+    /* Tabs */
     .stTabs [data-baseweb="tab-list"] { gap: 8px; }
     .stTabs [data-baseweb="tab"] {
         height: 45px; border-radius: 8px;
+        background-color: #FFFFFF !important;
+        border: 1px solid #E2E8F0;
+        color: #64748B !important;
         font-weight: 600;
     }
+    .stTabs [aria-selected="true"] {
+        background-color: #0F172A !important;
+        color: #FFFFFF !important;
+    }
+    
+    /* Tables & Inputs */
+    [data-testid="stDataFrame"] { background-color: #FFFFFF !important; }
+    div[data-baseweb="select"] > div { background-color: #FFFFFF !important; color: black; }
 </style>
 """, unsafe_allow_html=True)
+
+# --- HELPERS ---
 
 @st.cache_data(show_spinner=False)
 def load_data(filename):
@@ -70,90 +101,128 @@ def save_data(df, filename):
     load_data.clear()
 
 @st.cache_data(show_spinner=False)
-def get_asc_styled_html(file_path):
-    if not os.path.exists(file_path): 
-        return "<div>File not found.</div>"
+def get_asc_styled_html(file_path, file_name):
+    """
+    Injects JS that creates a real file object for LocalSend/System Share.
+    """
+    if not os.path.exists(file_path): return "<div>File not found.</div>"
 
     with open(file_path, 'r', encoding='utf-8') as f:
         soup = BeautifulSoup(f.read(), "html.parser")
 
-    adaptive_css = """
+    # CLEAN JS FOR FILE SHARING & PRINTING
+    enhanced_html = f"""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap');
         
-        :root {
-            --bg-color: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --header-bg: #f1f5f9;
-            --card-bg: #ffffff;
-            --border-color: #e2e8f0;
-            --day-header-bg: #475569;
-            --day-header-text: #ffffff;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #0e1117;
-                --text-primary: #f0f2f6;
-                --text-secondary: #aeb5bc;
-                --header-bg: #262730;
-                --card-bg: #1f2937;
-                --border-color: #374151;
-                --day-header-bg: #1e293b;
-                --day-header-text: #60a5fa;
-            }
-        }
-
-        body { margin: 0; padding: 10px; font-family: 'Inter', sans-serif; background-color: transparent; }
+        body {{ margin: 0; padding: 20px; font-family: 'Inter', sans-serif; background-color: #FFFFFF; }}
         
-        table { 
-            width: 100%; border-collapse: separate; border-spacing: 6px; table-layout: fixed; 
-        }
+        /* Toolbar */
+        .toolbar {{ 
+            display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+            padding: 12px; background: #F1F5F9; border-radius: 10px; border: 1px solid #E2E8F0;
+            align-items: center; justify-content: space-between;
+        }}
+        .tool-group {{ display: flex; gap: 10px; }}
         
-        th { 
-            background-color: var(--header-bg); color: var(--text-secondary);
+        .btn {{
+            padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600;
+            border: 1px solid #CBD5E1; cursor: pointer; display: flex; align-items: center; gap: 8px;
+            background: white; color: #334155; transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }}
+        .btn:hover {{ background: #F8FAFC; border-color: #64748B; transform: translateY(-1px); }}
+        
+        .btn-primary {{ background: #0F172A; color: white; border-color: #0F172A; }}
+        .btn-primary:hover {{ background: #334155; color: white; }}
+        
+        .btn-share {{ background: #ff7e5f; color: white; border: none; background: linear-gradient(90deg, #ff7e5f, #feb47b); }}
+        .btn-share:hover {{ opacity: 0.9; }}
+
+        /* Table Styling */
+        table {{ width: 100%; border-collapse: separate; border-spacing: 6px; table-layout: fixed; }}
+        
+        th {{ 
+            background-color: #F1F5F9; color: #475569;
             padding: 12px; font-size: 11px; text-transform: uppercase; 
             border-radius: 6px; font-weight: 700;
-        }
+        }}
 
-        .day-cell { 
-            background-color: var(--day-header-bg) !important; color: var(--day-header-text) !important; 
+        .day-cell {{ 
+            background-color: #334155 !important; color: white !important; 
             font-size: 16px; font-weight: 800; text-align: center; 
             vertical-align: middle; border-radius: 8px; width: 60px;
-        }
+        }}
 
-        td { 
-            height: 90px; vertical-align: top; padding: 8px; 
-            background-color: var(--card-bg) !important;
+        td {{ 
+            height: 95px; vertical-align: top; padding: 8px; 
+            background-color: #FFFFFF !important;
             border-radius: 8px; 
-            border: 1px solid var(--border-color);
-            transition: transform 0.1s;
-        }
+            border: 1px solid #E2E8F0;
+        }}
         
-        td:hover { transform: translateY(-2px); border-color: #3B82F6; }
+        .card-content {{ display: flex; flex-direction: column; height: 100%; justify-content: space-between; }}
+        .subject-name {{ font-size: 13px; font-weight: 800; color: #1E293B; line-height: 1.2; }}
+        .meta-info {{ display: flex; gap: 4px; flex-wrap: wrap; margin-top: auto; }}
+        .badge {{ font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; }}
+        .b-teacher {{ background: #F1F5F9; color: #64748B; }}
+        .b-room {{ background: #EFF6FF; color: #2563EB; }}
 
-        .card-content { display: flex; flex-direction: column; height: 100%; justify-content: space-between; }
-        
-        .subject-name { 
-            font-size: 13px; font-weight: 800; color: var(--text-primary); line-height: 1.2; 
-        }
-        
-        .meta-info { display: flex; gap: 4px; flex-wrap: wrap; margin-top: auto; }
-        
-        .badge { 
-            font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; 
-        }
-        .b-teacher { background: var(--header-bg); color: var(--text-secondary); }
-        .b-room { background: #EFF6FF; color: #2563EB; }
-        
-        td:empty { background: transparent !important; border: 1px dashed var(--border-color); }
+        /* Print Specifics */
+        @media print {{
+            .toolbar {{ display: none !important; }}
+            body {{ padding: 0; }}
+            td {{ border: 1px solid #ccc !important; }}
+            /* Ensure background colors print */
+            * {{ -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }}
+        }}
     </style>
+
+    <div class="toolbar">
+        <div class="tool-group">
+            <button onclick="window.print()" class="btn">
+                📄 Print / Save PDF
+            </button>
+        </div>
+        <div class="tool-group">
+            <!-- This triggers the native share sheet which LocalSend uses -->
+            <button onclick="shareFile()" class="btn btn-share">
+                <span style="font-size: 1.2em;">📡</span> Local Share / LocalSend
+            </button>
+        </div>
+    </div>
+
+    <script>
+        async function shareFile() {{
+            // 1. Get HTML Content
+            const htmlContent = document.documentElement.outerHTML;
+            
+            // 2. Create a Blob (File Object)
+            const blob = new Blob([htmlContent], {{ type: 'text/html' }});
+            
+            // 3. Create a File object (needed for LocalSend detection)
+            const file = new File([blob], "{file_name}", {{ type: 'text/html' }});
+
+            // 4. Trigger Native Share
+            if (navigator.canShare && navigator.canShare({{ files: [file] }})) {{
+                try {{
+                    await navigator.share({{
+                        files: [file],
+                        title: 'Class Routine',
+                        text: 'Sharing class routine file.'
+                    }});
+                }} catch (error) {{
+                    console.log('Share failed or canceled', error);
+                }}
+            }} else {{
+                alert("Native file sharing not supported on this browser. Please use the Download button below and drag the file to LocalSend.");
+            }}
+        }}
+    </script>
     """
 
-    def get_subject_color(name):
+    def get_color(name):
         h = int(hashlib.md5(name.encode()).hexdigest(), 16) % 360
-        return f"hsl({h}, 70%, 50%)" 
+        return f"hsl({h}, 80%, 96%)" 
 
     for tr in soup.find_all("tr"):
         cells = tr.find_all(["td", "th"])
@@ -170,8 +239,8 @@ def get_asc_styled_html(file_path):
                 teacher = text_content[1] if len(text_content) > 1 else ""
                 room = text_content[2] if len(text_content) > 2 else ""
 
-                accent = get_subject_color(subj)
-                cell['style'] = f"border-left: 3px solid {accent};"
+                bg = get_color(subj)
+                cell['style'] = f"background-color: {bg} !important; border-top: 3px solid hsl({int(hashlib.md5(subj.encode()).hexdigest(), 16) % 360}, 60%, 60%);"
 
                 new_html = f"""
                 <div class="card-content">
@@ -185,19 +254,21 @@ def get_asc_styled_html(file_path):
                 cell.clear()
                 cell.append(BeautifulSoup(new_html, "html.parser"))
 
-    return adaptive_css + str(soup)
+    return enhanced_html + str(soup)
 
+# --- UI START ---
+
+# Sidebar Logo
 logo_path = os.path.join("assets", "logo.png")
 if os.path.exists(logo_path):
     st.sidebar.image(logo_path, use_container_width=True)
-    st.sidebar.markdown("<div style='margin-bottom: 20px;'></div>", unsafe_allow_html=True)
+    st.sidebar.markdown("---")
 
 menu = st.sidebar.radio("Navigation", ["Overview", "Data Studio", "Generator", "Schedules"])
 
 if menu == "Overview":
     st.markdown('<div class="main-header">Department Overview</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Summary of academic resources</div>', unsafe_allow_html=True)
-
+    
     df_t = load_data("teachers.csv")
     df_c = load_data("classes.csv")
     df_curr = load_data("curriculum.csv")
@@ -213,23 +284,24 @@ if menu == "Overview":
     
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("Teacher Workload")
+        st.subheader("Workload")
         if not df_curr.empty and "Teacher" in df_curr.columns:
             load_counts = df_curr['Teacher'].value_counts().reset_index()
             load_counts.columns = ['Teacher', 'Count']
             fig = px.bar(load_counts, x='Teacher', y='Count')
+            fig.update_layout(plot_bgcolor="rgba(0,0,0,0)")
             st.plotly_chart(fig, use_container_width=True)
         else:
-            st.info("No curriculum data.")
+            st.info("No curriculum data found.")
 
     with col2:
-        st.subheader("Subject Distribution")
+        st.subheader("Subjects")
         if not df_curr.empty and "Subject" in df_curr.columns:
             sub_counts = df_curr['Subject'].value_counts().reset_index()
             fig2 = px.pie(sub_counts, values='count', names='Subject', hole=0.4)
             st.plotly_chart(fig2, use_container_width=True)
         else:
-            st.info("No curriculum data.")
+            st.info("No curriculum data found.")
 
 elif menu == "Data Studio":
     st.markdown('<div class="main-header">Data Studio</div>', unsafe_allow_html=True)
@@ -326,9 +398,13 @@ elif menu == "Schedules":
             sel_file = st.selectbox("Select File", files)
             if sel_file:
                 path = os.path.join("output", sel_file)
-                html = get_asc_styled_html(path)
+                html = get_asc_styled_html(path, sel_file)
+                
+                # Render the High Quality HTML
                 st.components.v1.html(html, height=800, scrolling=True)
+                
+                # Download Button for Manual LocalSend usage
                 with open(path, "rb") as f:
-                    st.download_button("Download", f, file_name=sel_file)
+                    st.download_button("📥 Download HTML Source", f, file_name=sel_file)
         else:
             st.info("No files generated.")
